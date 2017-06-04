@@ -1,4 +1,4 @@
 markdown: kramdown
 theme: minima
-
+mathjax: true
 

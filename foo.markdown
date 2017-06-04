@@ -1,3 +1,7 @@
+---
+layout: default
+title: foo
+---
 # Test
 asdf
 asdf

@@ -5,3 +5,4 @@ asdf
 
 ## Foo
 asdfasfd
+$$ \lambda $$

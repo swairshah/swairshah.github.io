@@ -16,8 +16,7 @@
 title: Swair Shah
 email: swairshah@gmail.com 
 description: >- # this means to ignore newlines until "baseurl:"
-    This blog is a set of notes by Swair Shah. Mostly on Machine Learning and
-    Math.
+    This is the personal webpage of Swair Shah. Go to the Projects & Publication page in the navigation bar for my portfolio. The posts are mostly on machine learning and math.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: swairshah

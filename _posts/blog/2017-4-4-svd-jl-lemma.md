@@ -123,6 +123,11 @@ for i, eps in enumerate(eps_range):
 The first thing to notice is that for $\epsilon \le 0.01$ the demands on $k$
 are completely impractical. For example, if we have 20 points we need $k \ge 20
 241267$, (irrespective of input dimensions as we saw before). This is outrageous! 
-The only way JL-lemma helps us is if we have exteremly high dimensional points with a not-so-small $\epsilon$. 
+The only way JL-lemma helps us is if we have exteremly high dimensional points (and remember we assumed that $D \le n$)
+with a not-so-small $\epsilon$ required for our application.
 If we have $\epsilon = 0.1$ then for $n = 40020$ points we can get a reduction
 to $k = 9084$ dimensions which is promising.
+
+The full code for this post can be found [this Github repository][github-notebook].
+
+[github-notebook]: [https://github.com/swairshah/swairshah.github.io/blob/master/notebooks/svd%20and%20JL-lemma.ipynb]

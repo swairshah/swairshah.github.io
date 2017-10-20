@@ -104,7 +104,7 @@ A surprising fact of this result is that $k$ is independent of $D$, the
 original dimension of the points. One thing we can say about $D$ is that we can
 safely assume $D < n$. Why is that? Because in case $D > n$, the dimension of
 the space spanned by the $n$ input points is $\le n$. Thus we only care about
-the space with dimensions $\le min\{D, n\}$. 
+the space with dimensions $\le min\\{D, n\\}$. 
 Let us get some intuition on the upperbound of $k$ as a function of $n$ and $\epsilon$.
 
 {% highlight python %}

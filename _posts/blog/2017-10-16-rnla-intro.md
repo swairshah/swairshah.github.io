@@ -82,6 +82,7 @@ $$
 
 which is the sum of variances of all individual entries $x_{i,j}$ of
 
+$$
 \begin{align}
 \mathbb{E}[~\|X - AB\|^2_F~] \
 = \sum_{i=1}^m \sum_{j=1}^p Var(x_{i,j}) \\
@@ -90,3 +91,4 @@ which is the sum of variances of all individual entries $x_{i,j}$ of
 
 \sum_{j} p_j \Big(\frac{A[:,j] B[j,:]} {p_j} \Big) = AB
 \end{align}
+$$

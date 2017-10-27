@@ -40,8 +40,7 @@ form with the origin. Each of these sampling methods have approximation
 guarantees for various problems. We will discuss first three sampling methods
 and some application for which there are approximation results.
 
-Approximate matrix multiplication
-----
+### Approximate matrix multiplication
 
 Given $A_{m \times n}$ and $B_{n \times p}$, we would like to approximate their
 product. One way to write a product $AB$ is as follows:
@@ -77,8 +76,16 @@ $$
 Let us see what is the variance of this estimator. 
 
 $$
-\text{since } \mathbb{E}[X] = AB \\
-\mathbb{E}[\|X - AB\|] = \sum_{j} p_j \Big(\frac{A[:,j] B[j,:]} {p_j} \Big) = AB
+\text{since } \mathbb{E}[X] = AB,~~~
+\mathbb{E}[~\|X - AB\|^2_F~] = \mathbb{E}[~\|X - \mathbb{E}[X] \|^2_F~]  \\
 $$
 
-We want this to be a good estimator so we should find a 
+which is the sum of variances of all individual entries $x_{i,j}$ of
+\[
+\mathbb{E}[~\|X - AB\|^2_F~] \
+= \sum_{i=1}^m \sum_{j=1}^p Var(x_{i,j}) \\
+= \sum_{i,j} \Big( \mathbb{E}[x_{i,j}^2] - \mathbb{E}^2[x_{i,j}] \Big) \
+= \sum_{i,j} \Big(
+
+\sum_{j} p_j \Big(\frac{A[:,j] B[j,:]} {p_j} \Big) = AB
+\]

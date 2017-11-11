@@ -130,4 +130,4 @@ to $k = 9084$ dimensions which is promising.
 
 The full code for this post can be found at [this Github repository][github-notebook].
 
-[github-notebook]: [https://github.com/swairshah/swairshah.github.io/blob/master/notebooks/svd%20and%20JL-lemma.ipynb]
+[github-notebook]: https://github.com/swairshah/swairshah.github.io/blob/master/notebooks/svd%20and%20JL-lemma.ipynb

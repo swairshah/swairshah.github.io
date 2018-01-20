@@ -80,15 +80,41 @@ $$
 \mathbb{E}[~\|X - AB\|^2_F~] = \mathbb{E}[~\|X - \mathbb{E}[X] \|^2_F~]  \\
 $$
 
-which is the sum of variances of all individual entries $x_{i,j}$ of
+which is the sum of variances of all individual entries $x_{i,j}$ of $X$.
 
 $$
 \begin{align}
-\mathbb{E}[~\|X - AB\|^2_F~] \
-= \sum_{i=1}^m \sum_{j=1}^p Var(x_{i,j}) \\
-= \sum_{i,j} \Big( \mathbb{E}[x_{i,j}^2] - \mathbb{E}^2[x_{i,j}] \Big) \
-= \sum_{i,j} \Big(
-
-\sum_{j} p_j \Big(\frac{A[:,j] B[j,:]} {p_j} \Big) = AB
+\mathbb{E}[~\|X - AB\|^2_F~] 
+&= \sum_{i=1}^m \sum_{j=1}^p Var(x_{i,j}) \\
+&= \sum_{i,j} \Big( \mathbb{E}[x_{i,j}^2] - \mathbb{E}^2[x_{i,j}] \Big) \\
+&= \sum_{i,j} \Big( \mathbb{E}[x_{i,j}^2] \Big) - \|AB\|^2_F \\
 \end{align}
 $$
+
+$$
+\begin{align}
+\sum_{i,j} \Big( \mathbb{E}[x_{i,j}^2] \Big) 
+&= \sum_{i,j} \Big( \sum_k \frac{ a_{i,k}^2 b_{k,j}^2 } {p_k} \Big) \\
+&= \sum_{k} (1/p_k) \Big( \sum_{i,j} a_{i,k}^2 b_{k,j}^2 \Big)  \\
+&= \sum_{j} p_j \Big(\frac{A[:,j] B[j,:]} {p_j} \Big) 
+\end{align}
+$$
+
+(Kannan & Vempala 2017) [^survey]
+(MC for Matrices I) [^mc1]
+(MC for Matrices II) [^mc2]
+(MC for Matrices III) [^mc3]
+(ACM Com. Article 2016) [^acm]
+
+### References
+
+[^survey]: R. Kannan and S. Vempala, “Randomized algorithms in numerical linear algebra,” Acta Numerica, vol. 26, pp. 95–135, May 2017.
+
+[^mc1]: P. Drineas, R. Kannan, and M. W. Mahoney, “Fast Monte Carlo Algorithms for Matrices I: Approximating Matrix Multiplication,” SIAM Journal on Computing, vol. 36, no. 1, pp. 132–157, Jan. 2006. Available at: [https://www.stat.berkeley.edu/~mmahoney/pubs/matrix1_SICOMP.pdf](https://www.stat.berkeley.edu/~mmahoney/pubs/matrix1_SICOMP.pdf)
+
+[^mc2]: P. Drineas, R. Kannan, and M. W. Mahoney, “Fast Monte Carlo Algorithms for Matrices II: Computing a Low-Rank Approximation to a Matrix,” SIAM Journal on Computing, vol. 36, no. 1, pp. 158–183, Jan. 2006. Available at: [https://www.stat.berkeley.edu/~mmahoney/pubs/matrix2_SICOMP.pdf](https://www.stat.berkeley.edu/~mmahoney/pubs/matrix2_SICOMP.pdf)
+
+[^mc3]: P. Drineas, R. Kannan, and M. W. Mahoney, “Fast Monte Carlo Algorithms for Matrices III: Computing a Compressed Approximate Matrix Decomposition,” SIAM Journal on Computing, vol. 36, no. 1, pp. 184–206, Jan. 2006. Available at: [https://www.stat.berkeley.edu/~mmahoney/pubs/matrix3_SICOMP.pdf](https://www.stat.berkeley.edu/~mmahoney/pubs/matrix3_SICOMP.pdf)
+
+[^acm]: P. Drineas and M. W. Mahoney, “RandNLA: randomized numerical linear algebra,” Communications of the ACM, vol. 58, no. 6, pp. 80–90, May 2016. Available at: [https://cacm.acm.org/magazines/2016/6/202647-randnla/fulltext](https://cacm.acm.org/magazines/2016/6/202647-randnla/fulltext)
+

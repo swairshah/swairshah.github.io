@@ -67,8 +67,8 @@ def ksvd_optim(X, k = 2):
       v = V[:,i]
       X_approx += X @ np.outer(v, v.T)
 
-    # similar case for m < n
-    return X_approx
+  # similar case for m < n
+  return X_approx
 {% endhighlight %}
 We can compare the relative speeds of these methods. 
 

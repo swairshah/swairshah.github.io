@@ -23,7 +23,7 @@ singular vector matrices with their dimensions.
 We make the following trivial observation, $X X^T = U \Sigma^2 U^T$
 (and $X^T X = V \Sigma^2 V^T$).
 Now if $m \ll n$ (or $m \gg n$) we can get $U$ (or $V$) by computing the
-Eigenvalue decomposition of $X X^T$ $m (or $X^T X$), which is now a very small matrix and
+Eigenvalue decomposition of $X X^T$ (or $X^T X$), which is now a very small matrix and
 computing Eigenvalue decomposition is faster and doesn't require too much memory as
 well.
 
@@ -58,17 +58,17 @@ def ksvd_optim(X, k = 2):
   X_approx = np.zeros(X.shape)    
   m, n = X.shape
   if m >= n: 
-	e, V = LA.eig(X.T @ X)
-	idx = np.argsort(-e) # sorting the eigens in descending order
-	e = e[idx]     
-	V = V[:,idx]
-	for i in range(k):
-	  e = e[i]
-	  v = V[:,i]
-	  X_approx += X @ np.outer(v, v.T)
+    e, V = LA.eig(X.T @ X)
+    idx = np.argsort(-e) # sorting the eigens in descending order
+    e = e[idx]     
+    V = V[:,idx]
+    for i in range(k):
+      e = e[i]
+      v = V[:,i]
+      X_approx += X @ np.outer(v, v.T)
 
-	# similar case for m < n
-	return X_approx
+    # similar case for m < n
+    return X_approx
 {% endhighlight %}
 We can compare the relative speeds of these methods. 
 

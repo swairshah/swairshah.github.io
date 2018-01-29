@@ -272,3 +272,62 @@ a:hover {
     //text-decoration: underline;
 }
 
+/* Math */
+
+.theorem {
+	display: block;
+	font-style: italic;
+}
+.theorem:before {
+	content: "Theorem. ";
+	font-weight: bold;
+	font-style: normal;
+}
+.theorem[text]:before {
+	content: "Theorem (" attr(text) ") ";
+}
+
+.definition {
+	display: block;
+	font-style: italic;
+}
+.definition:before {
+	content: "Definition. ";
+	font-weight: bold;
+	font-style: normal;
+}
+.definition[text]:before {
+	content: "Definition (" attr(text) ") ";
+}
+
+.proposition {
+	display: block;
+	font-style: italic;
+}
+.proposition:before {
+	content: "Proposition. ";
+	font-weight: bold;
+	font-style: normal;
+}
+.proposition[text]:before {
+	content: "proposition (" attr(text) ") ";
+}
+
+.proof {
+	display: block;
+	font-style: normal;
+}
+.proof:before {
+	content: "Proof. ";
+	font-weight: normal;
+	font-style: italic;
+}
+.proof[text]:before {
+	content: "proof (" attr(text) ") ";
+    font-style: normal;
+}
+.proof:after {
+    content: "∎";
+}
+
+

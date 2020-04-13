@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Notes - Test</title><link href="https://swairshah.github.io/" rel="alternate"></link><link href="https://swairshah.github.io/feeds/test.atom.xml" rel="self"></link><id>https://swairshah.github.io/</id><updated>2020-04-10T00:00:00-07:00</updated><entry><title>Notes - Test</title><link href="https://swairshah.github.io/notes-test.html" rel="alternate"></link><published>2020-04-10T00:00:00-07:00</published><updated>2020-04-10T00:00:00-07:00</updated><author><name>Swair</name></author><id>tag:swairshah.github.io,2020-04-10:/notes-test.html</id><content type="html">&lt;p&gt;Moving to pelican from jekyll
-+=+This is a test+=+
-&lt;span class="pelican-inline"&gt;what is this&lt;/span&gt;&lt;/p&gt;</content><category term="Test"></category></entry></feed>

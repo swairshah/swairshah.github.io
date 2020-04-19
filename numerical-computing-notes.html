@@ -1,45 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-          <title>Working Notes - Numerical Computing Notes</title>
-        <meta charset="utf-8" />
-        <link href="https://swairshah.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Working Notes Full Atom Feed" />
-        <link href="https://swairshah.github.io/feeds/linear-algebra-ml-julia.atom.xml" type="application/atom+xml" rel="alternate" title="Working Notes Categories Atom Feed" />
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <!--script async src="https://www.googletagmanager.com/gtag/js?id=UA-41105501-1"></script-->
+  <script type="text/javascript" src="/theme/js/refs_v1.js"> </script> 
+  <script type="text/javascript" src="/theme/js/bibtexParse.js"> </script> 
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-41105501-1');
+  </script>
+
+  <meta charset="utf-8" />
+  <title>Numerical Computing Notes</title>
+  <meta name="author" content="Swair" />
+  <link rel="stylesheet" type="text/css" href="/theme/tufte-css/tufte.css" />
+  <link rel="stylesheet" type="text/css" href="/theme/css/main.css" />
+  <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png" />
+  <link rel="shortcut icon" href="/static/favicon.ico" />
+  <link rel="icon" type="image/png" href="/static/favicon.png" />
+
+  <!-- OpenGraph Info -->
 
 
-
+  <style type="text/css">
+    .blue {
+      color: blue;
+    }
+  </style>
 
 
 </head>
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="https://swairshah.github.io/">Working Notes <strong></strong></a></h1>
-        </header><!-- /#banner -->
-        <nav id="menu"><ul>
-            <li><a href="https://swairshah.github.io/category/julia-simulation-physics.html">Julia, Simulation, Physics</a></li>
-            <li class="active"><a href="https://swairshah.github.io/category/linear-algebra-ml-julia.html">Linear-Algebra, ML, Julia</a></li>
-        </ul></nav><!-- /#menu -->
-<section id="content" class="body">
-  <header>
-    <h2 class="entry-title">
-      <a href="https://swairshah.github.io/numerical-computing-notes.html" rel="bookmark"
-         title="Permalink to Numerical Computing Notes">Numerical Computing Notes</a></h2>
- 
-  </header>
-  <footer class="post-info">
-    <time class="published" datetime="2020-04-10T00:00:00-07:00">
-      Fri 10 April 2020
-    </time>
-    <address class="vcard author">
-      By           <a class="url fn" href="https://swairshah.github.io/author/swair.html">Swair</a>
-    </address>
-    <div class="category">
-        Category: <a href="https://swairshah.github.io/category/linear-algebra-ml-julia.html">Linear-Algebra, ML, Julia</a>
-    </div>
-  </footer><!-- /.post-info -->
-  <div class="entry-content">
-    <h2>Errors in numerical computations and condition number</h2>
+<body>
+<header>
+  <h1 class="websitetitle"><a href="">Working Notes</a></h1>
+  <!-- <nav class="navmenu" id="navmenu">
+    <li><a class="navitemlink" href="/archives.html">Archive</a></li>
+   </nav> -->
+   <nav class="navmenu" id="navmenu">
+    <li><a class="navitemlink" href="/pages/about.html">About</a></li>
+    <li><a class="navitemlink" href="/">Blog</a></li>
+    <li><a class="navitemlink" href="/archives.html">Archive</a></li>
+   </nav>
+ </header>
+<article>
+
+<header class="post-header">
+<h1> <a rel="bookmark"
+   title="Numerical Computing Notes «Working Notes»"
+   href="/numerical-computing-notes.html">
+   Numerical Computing Notes
+</a>
+</h1>
+<p class="subtitle"></p>
+<p class="articlemeta"><label for="numerical-computing-notes" class="margin-toggle"> ⊕</label><input type="checkbox" id="numerical-computing-notes" class="margin-toggle" />
+<span class="marginnote"><br/>
+By Swair.
+<br/><br />
+Category: <a href="/category/linear-algebra-ml-julia.html">Linear-Algebra, ML, Julia</a>
+<br />
+<br /><br/>
+<time datetime="2020-04-10T00:00:00-07:00">Fri 10 April 2020</time>
+
+</span>
+</p>
+
+
+
+</header><div id="TOC"> </div>
+<h2>Errors in numerical computations and condition number</h2>
 <p>There are various ways erros creep into numerical computations,
 e.g. discretization, modelling, approximation etc.
 In many numerical computations we are trying to approximate a solution,
@@ -211,13 +243,35 @@ a given norm <span class="math">\(\| \cdot \|\)</span> is, |-| this is not worki
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>
-  </div><!-- /.entry-content -->
-</section>
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">
-                Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
-                which takes great advantage of <a href="http://python.org">Python</a>.
-                </address><!-- /#about -->
-        </footer><!-- /#contentinfo -->
+</article>
+<!--div id="disqus_thread"></div-->
+<script>
+doTOC();
+doNotes();    
+</script>
+<!--script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://isaythings.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script-->
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<!-- <footer>
+  <p>Powered by <a href="http://pelican.readthedocs.org">Pelican</a></p>
+</footer> -->
+<!--script id="dsq-count-scr" src="//isaythings.disqus.com/count.js" async></script-->
 </body>
+
 </html>

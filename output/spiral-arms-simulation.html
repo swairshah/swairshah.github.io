@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <!--script async src="https://www.googletagmanager.com/gtag/js?id=UA-41105501-1"></script-->
+  <script type="text/javascript" src="/theme/js/refs_v1.js"> </script> 
+  <script type="text/javascript" src="/theme/js/bibtexParse.js"> </script> 
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-41105501-1');
+  </script>
+
+  <meta charset="utf-8" />
+  <title>Spiral Arms Simulation</title>
+  <meta name="author" content="Swair" />
+  <link rel="stylesheet" type="text/css" href="/theme/tufte-css/tufte.css" />
+  <link rel="stylesheet" type="text/css" href="/theme/css/main.css" />
+  <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png" />
+  <link rel="shortcut icon" href="/static/favicon.ico" />
+  <link rel="icon" type="image/png" href="/static/favicon.png" />
+
+  <!-- OpenGraph Info -->
+
+
+  <style type="text/css">
+    .blue {
+      color: blue;
+    }
+  </style>
+
+
+</head>
+
+<body>
+<header>
+  <h1 class="websitetitle"><a href="">Working Notes</a></h1>
+  <!-- <nav class="navmenu" id="navmenu">
+    <li><a class="navitemlink" href="/archives.html">Archive</a></li>
+   </nav> -->
+   <nav class="navmenu" id="navmenu">
+    <li><a class="navitemlink" href="/pages/about.html">About</a></li>
+    <li><a class="navitemlink" href="/">Blog</a></li>
+    <li><a class="navitemlink" href="/archives.html">Archive</a></li>
+   </nav>
+ </header>
+<article>
+
+<header class="post-header">
+<h1> <a rel="bookmark"
+   title="Spiral Arms Simulation «Working Notes»"
+   href="/spiral-arms-simulation.html">
+   Spiral Arms Simulation
+</a>
+</h1>
+<p class="subtitle"></p>
+<p class="articlemeta"><label for="spiral-arms-simulation" class="margin-toggle"> ⊕</label><input type="checkbox" id="spiral-arms-simulation" class="margin-toggle" />
+<span class="marginnote"><br/>
+By Swair.
+<br/><br />
+Category: <a href="/category/julia-simulation-physics.html">Julia, Simulation, Physics</a>
+<br />
+<br /><br/>
+<time datetime="2020-04-18T00:00:00-07:00">Sat 18 April 2020</time>
+
+</span>
+</p>
+
+
+
+</header><div id="TOC"> </div>
+<h2>Spiral Arms in Galaxies</h2>
+<p>A few weeks back I came across a nice simulation on twitter which explained how
+spiral arms are formed in some galaxies <span class="dt-note"><img alt="" src="figures/galaxy2.png"></span>.
+We can see the spiral arms in this hubble picture of the
+M18 galaxy <span class="dt-note"><img alt="M18" src="figures/galaxy.jpg"></span>.
+It turns out there is a theory called the Lin-Shu Theory or
+<a href="https://en.wikipedia.org/wiki/Density_wave_theory">Density Wave Theory</a> which
+explains these spiral arms as the high density regions in a galaxy where many
+elliptical orbits of objects revolving around the center of the galaxy happen to pass.
+A friend of mine is an avid astrophotographer he wanted to know if the generation
+of subsequent elliptical orbits is more stochastic would it still lead to such
+a phenomenon.  I created a simulation in Julia to try this out.</p>
+<p>It is somewhat instructive to go through the process of building up such a simulation
+in Julia.</p>
+<h2>Parametric Plots in Julia</h2>
+<p>To plot a circle we need <span class="math">\((x, y)\)</span> points such that <span class="math">\(x^2 + y^2 = r^2\)</span>.
+A good way to plot this is to use a
+<a href="https://en.wikipedia.org/wiki/Parametric_equation">parametric equation</a>.
+We can parametrize a circle by the angle <span class="math">\(t\)</span> as follows,</p>
+<p class=equation>
+$$
+x = cos(t)\\
+y = sin(t)
+$$
+</p>
+
+<p>It is very straight forward to plot this in julia</p>
+<div class="highlight"><pre><span></span><code><span class="k">using</span> <span class="n">Plots</span>
+<span class="n">xₜ</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="n">yₜ</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">xₜ</span><span class="p">,</span> <span class="n">yₜ</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="nb">π</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span><span class="mi">300</span><span class="p">))</span>
+</code></pre></div>
+
+
+<p><img alt="" src="figures/SpiralArmSimulation_2_1.png"></p>
+<p>To plot an ellipse we need to add ability to scale major and minor
+axes differently.</p>
+<div class="highlight"><pre><span></span><code><span class="k">using</span> <span class="n">Plots</span>
+<span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">xₜ</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="n">yₜ</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">=</span> <span class="n">b</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">xₜ</span><span class="p">,</span> <span class="n">yₜ</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="nb">π</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span><span class="mi">300</span><span class="p">))</span>
+</code></pre></div>
+
+
+<p><img alt="" src="figures/SpiralArmSimulation_3_1.png"></p>
+<p>Now we need to be able to rotate the ellipse.
+We can use the rotation operator to get the parametric equations for the
+ellipse rotated by an angle <span class="math">\(\phi\)</span>.</p>
+<p class=equation>
+$$
+\begin{pmatrix}
+x' \\
+y'
+\end{pmatrix}
+=
+\begin{pmatrix}
+cos~\phi & -sin~\phi \\
+sin~\phi & cos~\phi
+\end{pmatrix}
+\cdot
+\begin{pmatrix}
+x \\
+y
+\end{pmatrix}
+$$
+</p>
+
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">ϕ</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">π</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">xₜ</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">ϕ</span><span class="p">)</span> <span class="o">-</span> <span class="n">b</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">ϕ</span><span class="p">)</span>
+<span class="n">yₜ</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">=</span> <span class="n">b</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">ϕ</span><span class="p">)</span> <span class="o">-</span> <span class="n">b</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">ϕ</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">xₜ</span><span class="p">,</span> <span class="n">yₜ</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="nb">π</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span><span class="mi">300</span><span class="p">))</span>
+</code></pre></div>
+
+
+<p><img alt="" src="figures/SpiralArmSimulation_4_1.png"></p>
+<h2>Animating Plots</h2>
+<div class="highlight"><pre><span></span><code><span class="k">using</span> <span class="n">Interact</span>
+<span class="n">r</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">ylims</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span><span class="mi">300</span><span class="p">))</span>
+<span class="n">anim</span> <span class="o">=</span> <span class="nd">@animate</span> <span class="k">for</span> <span class="n">ϕ</span> <span class="o">=</span> <span class="mi">0</span><span class="o">:</span><span class="mf">0.14</span><span class="o">:</span><span class="nb">π</span>
+   <span class="kd">global</span> <span class="n">r</span>
+   <span class="n">r</span> <span class="o">+=</span> <span class="mf">0.14</span>
+   <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">r</span>
+   <span class="n">b</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">r</span>
+   <span class="n">xₜ</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">ϕ</span><span class="p">)</span> <span class="o">-</span> <span class="n">b</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">ϕ</span><span class="p">)</span>
+   <span class="n">yₜ</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">ϕ</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">ϕ</span><span class="p">)</span>
+   <span class="n">plot!</span><span class="p">(</span><span class="n">xₜ</span><span class="p">,</span> <span class="n">yₜ</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="nb">π</span><span class="p">,</span> <span class="n">color</span><span class="o">=:</span><span class="n">orangered</span><span class="p">)</span>
+<span class="k">end</span>
+<span class="n">gif</span><span class="p">(</span><span class="n">anim</span><span class="p">,</span> <span class="s">&quot;figures/simulation.gif&quot;</span><span class="p">,</span> <span class="n">fps</span> <span class="o">=</span> <span class="mi">2</span><span class="p">);</span>
+</code></pre></div>
+
+
+<p><img alt="" src="figures/simulation.gif"></p>
+<h2>Noisy Orbits</h2>
+<div class="highlight"><pre><span></span><code><span class="n">noise</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-&gt;</span> <span class="n">rand</span><span class="p">(</span><span class="n">Uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="n">x</span>
+<span class="k">function</span> <span class="n">simulate</span><span class="p">(</span><span class="n">ϵ</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span>
+   <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.12</span><span class="p">)</span>
+   <span class="n">plot</span><span class="p">(</span><span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">ylims</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span><span class="mi">300</span><span class="p">))</span>
+   <span class="n">anim</span> <span class="o">=</span> <span class="nd">@animate</span> <span class="k">for</span> <span class="n">ϕ</span> <span class="o">=</span> <span class="mi">0</span><span class="o">:</span><span class="mf">0.14</span><span class="o">:</span><span class="nb">π</span>
+      <span class="n">a</span> <span class="o">+=</span> <span class="n">r</span>
+      <span class="n">b</span> <span class="o">+=</span> <span class="n">r</span>
+      <span class="n">δ</span> <span class="o">=</span> <span class="n">noise</span><span class="p">(</span><span class="n">ϵ</span><span class="p">)</span>
+      <span class="n">xₜ</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">ϕ</span><span class="o">+</span><span class="n">δ</span><span class="p">)</span> <span class="o">-</span> <span class="n">b</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">ϕ</span><span class="o">+</span><span class="n">δ</span><span class="p">)</span>
+      <span class="n">yₜ</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">ϕ</span><span class="o">+</span><span class="n">δ</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">ϕ</span><span class="o">+</span><span class="n">δ</span><span class="p">)</span>
+      <span class="n">plot!</span><span class="p">(</span><span class="n">xₜ</span><span class="p">,</span> <span class="n">yₜ</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="nb">π</span><span class="p">,</span> <span class="n">color</span><span class="o">=:</span><span class="n">orangered</span><span class="p">)</span>
+   <span class="k">end</span>
+   <span class="n">anim</span>
+<span class="k">end</span><span class="p">;</span>
+</code></pre></div>
+
+
+<p><img alt="noise = 0.5" src="figures/gifs/simulation0_5.gif"></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+</article>
+<!--div id="disqus_thread"></div-->
+<script>
+doTOC();
+doNotes();    
+</script>
+<!--script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://isaythings.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script-->
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<!-- <footer>
+  <p>Powered by <a href="http://pelican.readthedocs.org">Pelican</a></p>
+</footer> -->
+<!--script id="dsq-count-scr" src="//isaythings.disqus.com/count.js" async></script-->
+</body>
+
+</html>

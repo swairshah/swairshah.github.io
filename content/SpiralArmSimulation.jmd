@@ -1,0 +1,136 @@
+---
+options:
+   out_width: 40%
+---
+
+Title: Spiral Arms Simulation
+Date: 2020-04-18
+Category: Julia, Simulation, Physics
+
+## Spiral Arms in Galaxies
+A few weeks back I came across a nice simulation on twitter which explained how
+spiral arms are formed in some galaxies [+]![](figures/galaxy2.png)[+].
+We can see the spiral arms in this hubble picture of the
+M18 galaxy [+]![M18](figures/galaxy.jpg)[+].
+It turns out there is a theory called the Lin-Shu Theory or
+[Density Wave Theory](https://en.wikipedia.org/wiki/Density_wave_theory) which
+explains these spiral arms as the high density regions in a galaxy where many
+elliptical orbits of objects revolving around the center of the galaxy happen to pass.
+A friend of mine is an avid astrophotographer he wanted to know if the generation
+of subsequent elliptical orbits is more stochastic would it still lead to such
+a phenomenon.  I created a simulation in Julia to try this out.
+
+It is somewhat instructive to go through the process of building up such a simulation
+in Julia.
+
+## Parametric Plots in Julia
+To plot a circle we need $(x, y)$ points such that $x^2 + y^2 = r^2$.
+A good way to plot this is to use a
+[parametric equation](https://en.wikipedia.org/wiki/Parametric_equation).
+We can parametrize a circle by the angle $t$ as follows,
+
+<p class=equation>
+$$
+x = cos(t)\\
+y = sin(t)
+$$
+</p>
+
+```julia echo=false
+using Plots, Interact, Distributions, StatsBase
+gr(leg=false, bg=colorant"#FFFFF8", aspect_ratio=1,
+   xaxis=false, yaxis=false, grid=false)
+
+using ColorSchemes, Colors
+orange = get(ColorSchemes.rainbow, 0.944);
+```
+It is very straight forward to plot this in julia
+```julia
+using Plots
+xₜ(t) = cos(t)
+yₜ(t) = sin(t)
+plot(xₜ, yₜ, 0, 2π, size=(300,300))
+```
+To plot an ellipse we need to add ability to scale major and minor
+axes differently.
+```julia
+using Plots
+(a, b) = (2, 1)
+xₜ(t) = a*cos(t)
+yₜ(t) = b*sin(t)
+plot(xₜ, yₜ, 0, 2π, size=(300,300))
+```
+Now we need to be able to rotate the ellipse.
+We can use the rotation operator to get the parametric equations for the
+ellipse rotated by an angle $\phi$.
+
+<p class=equation>
+$$
+\begin{pmatrix}
+x' \\
+y'
+\end{pmatrix}
+=
+\begin{pmatrix}
+cos~\phi & -sin~\phi \\
+sin~\phi & cos~\phi
+\end{pmatrix}
+\cdot
+\begin{pmatrix}
+x \\
+y
+\end{pmatrix}
+$$
+</p>
+
+
+```julia
+(a, b, ϕ) = (2, 1, π/4)
+xₜ(t) = a*cos(t)*cos(ϕ) - b*sin(t)*sin(ϕ)
+yₜ(t) = b*cos(t)*sin(ϕ) - b*sin(t)*cos(ϕ)
+plot(xₜ, yₜ, 0, 2π, size=(300,300))
+```
+
+## Animating Plots
+
+```julia
+using Interact
+r = 0
+plot(xlims=(-10,10), ylims=(-10,10), size=(300,300))
+anim = @animate for ϕ = 0:0.14:π
+   global r
+   r += 0.14
+   a = 1 + r
+   b = 2 + r
+   xₜ(t) = a*cos(t)*cos(ϕ) - b*sin(t)*sin(ϕ)
+   yₜ(t) = a*cos(t)*sin(ϕ) + b*sin(t)*cos(ϕ)
+   plot!(xₜ, yₜ, 0, 2π, color=:orangered)
+end
+gif(anim, "figures/simulation.gif", fps = 2);
+```
+![](figures/simulation.gif)
+
+## Noisy Orbits
+
+```julia
+noise = x -> rand(Uniform(0,1))*x
+function simulate(ϵ = 0.5)
+   (a, b, r) = (1, 2, 0.12)
+   plot(xlims=(-10,10), ylims=(-10,10), size=(300,300))
+   anim = @animate for ϕ = 0:0.14:π
+      a += r
+      b += r
+      δ = noise(ϵ)
+      xₜ(t) = a*cos(t)*cos(ϕ+δ) - b*sin(t)*sin(ϕ+δ)
+      yₜ(t) = a*cos(t)*sin(ϕ+δ) + b*sin(t)*cos(ϕ+δ)
+      plot!(xₜ, yₜ, 0, 2π, color=:orangered)
+   end
+   anim
+end;
+```
+
+```julia echo=false
+anim = simulate(0.5)
+gif(anim, "figures/gifs/simulation0_5.gif", fps = 2);
+```
+![noise = 0.5](figures/gifs/simulation0_5.gif)

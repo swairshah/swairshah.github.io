@@ -78,12 +78,12 @@ We can see the spiral arms in this hubble picture of the
 M18 galaxy <span class="dt-note"><img alt="M18" src="figures/galaxy.jpg"></span>.</p>
 <p>It turns out there is a theory called the Lin-Shu Theory or
 <a href="https://en.wikipedia.org/wiki/Density_wave_theory">Density Wave Theory</a> which
-explains these spiral arms as the high density regions in a galaxy where many
-elliptical orbits of objects revolving around the center of the galaxy happen to pass.
+explains these spiral arms as the high density regions where many
+elliptical orbits around the center of the galaxy happen to pass. Wikipedia has
+some useful plots and animations <span class="dt-note"><img alt="" src="figures/galaxy2.png"></span>.
 A friend of mine is an avid astrophotographer he wanted to know if the generation
 of subsequent elliptical orbits is more stochastic would it still lead to such
-a phenomenon. Wikipedia has some useful plots and animations
-<span class="dt-note"><img alt="" src="figures/galaxy2.png"></span>. I created a simulation in Julia to try this out.
+a phenomenon. I created a simulation in Julia to try this out.
 It is somewhat instructive to go through the process of building up such a simulation
 in Julia.</p>
 <h2>Parametric Plots in Julia</h2>
@@ -98,7 +98,7 @@ y = sin(t)
 $$
 </p>
 
-<p>It is very straight forward to plot this in julia</p>
+<p>It is very straight forward to plot this in Julia</p>
 <div class="highlight"><pre><span></span><code><span class="k">using</span> <span class="n">Plots</span>
 <span class="n">xₜ</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 <span class="n">yₜ</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
@@ -107,7 +107,7 @@ $$
 
 
 <p><img alt="" src="figures/SpiralArmSimulation_2_1.png"></p>
-<p>To plot an ellipse we need to add the ability to scale major and minor
+<p>To plot an ellipse we need to the add the ability to scale major and minor
 axes differently.</p>
 <div class="highlight"><pre><span></span><code><span class="k">using</span> <span class="n">Plots</span>
 <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -148,8 +148,8 @@ $$
 
 
 <p><img alt="" src="figures/SpiralArmSimulation_4_1.png"></p>
-<p>I always forget the order of entries in the rotation operator. I use the
-following trick to quickly derive it</p>
+<p>I tend to forget the order of entries in the rotation operator. I use the
+following trick to derive it</p>
 <p class=equation>
 $$
 x → cos~\theta,~ y → sin~\theta\\
@@ -163,7 +163,7 @@ $$
 </p>
 
 <h2>Animating Plots</h2>
-<p>We can use <code>Interact</code> package to create a GIF.</p>
+<p>We can use the <code>Interact</code> package to create a GIF.</p>
 <div class="highlight"><pre><span></span><code><span class="k">using</span> <span class="n">Interact</span>
 <span class="n">r</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">ylims</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span><span class="mi">300</span><span class="p">))</span>
@@ -182,7 +182,6 @@ $$
 
 <p><img alt="" src="figures/simulation.gif"></p>
 <h2>Noisy Orbits</h2>
-<p>Lets wrap it up inside a function and add a noise parameter.</p>
 <div class="highlight"><pre><span></span><code><span class="n">noise</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-&gt;</span> <span class="n">rand</span><span class="p">(</span><span class="n">Uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="n">x</span>
 <span class="k">function</span> <span class="n">simulate</span><span class="p">(</span><span class="n">ϵ</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span>
    <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.12</span><span class="p">)</span>

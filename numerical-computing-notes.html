@@ -60,10 +60,10 @@
 <span class="marginnote"><br/>
 By Swair.
 <br/><br />
-Category: <a href="/category/linear-algebra-ml-julia.html">Linear-Algebra, ML, Julia</a>
+Category: <a href="/category/numerical-linear-algebra-ml-julia-python.html">Numerical-Linear-Algebra, ML, Julia, Python</a>
 <br />
 <br /><br/>
-<time datetime="2020-04-10T00:00:00-07:00">Fri 10 April 2020</time>
+<time datetime="2020-04-20T00:00:00-07:00">Mon 20 April 2020</time>
 
 </span>
 </p>
@@ -71,42 +71,40 @@ Category: <a href="/category/linear-algebra-ml-julia.html">Linear-Algebra, ML, J
 
 
 </header><div id="TOC"> </div>
+<p>I did a fair bit of numerical linear algebra in my gradschool. Most of the time
+I used libraries written by my adviser Haim Schweitzer over the years. Some
+of the algorithms I came across were wonderful, e.g. Lanczos Iterations,
+Power Method. As I never had a proper course in Numerical Analysis
+I feel the need to understand some things which I missed. I will keep addind the
+notes and references here. I will also include some Julia or Python code.</p>
 <h2>Errors in numerical computations and condition number</h2>
-<p>There are various ways erros creep into numerical computations,
+<p>There are various ways erros can creep into numerical computations,
 e.g. discretization, modelling, approximation etc.
-In many numerical computations we are trying to approximate a solution,
-If we don't know the exact solution to say an problem how do we estimate the errors?
-For example say we want to find a root <span class="math">\(x_*\)</span> of <span class="math">\(f(x) = 0\)</span>,
+In many numerical computations we are trying to approximate a solution.
+If we don't know the exact solution then how can we estimate the errors?
+For example say, we want to find a root <span class="math">\(x_*\)</span> of <span class="math">\(f(x) = 0\)</span>,
 and our approxiate solution is <span class="math">\(x_{est}\)</span>, how do we measure error
 <span class="math">\(|x_* - x_{est}|\)</span> without knowing  <span class="math">\(x_*\)</span>?</p>
-<p>This is an example for the syntax. <span class="dt-note">This is a note that will appear
-in a tag in Markdown</span>. [-]And this is the side  comment[-].</p>
-<ol>
-<li>
 <p><strong>Forward Error</strong>: Use a proxy for the actual error as an estimate for the real
-    error. E.g. use <span class="math">\(|f(x_*) - f(x_{est})|\)</span> as a proxy for <span class="math">\(|x_* - x_{est}|\)</span>.</p>
-</li>
-<li>
+error. E.g. use <span class="math">\(|f(x_*) - f(x_{est})|\)</span> as a proxy for <span class="math">\(|x_* - x_{est}|\)</span>.</p>
 <p><strong>Backward Error</strong>: Estimate how much change in the problem is necessary
-    so that the approximate solution becomes exact? To understand this consider
-    solving the system of linear equations <span class="math">\(Ax = b\)</span>. Say we have an approximate
-    algorithm which gives us <span class="math">\(x_{est}\)</span>. We can compute <span class="math">\(Ax_{est} = b_{est}\)</span>,
-    the change <span class="math">\(b - b_{est}\)</span> is a change in <span class="math">\(b\)</span> (which is part of the problem
-    <em>formulation</em> ) can make the approximate solution exact. This is called the
-    backward error. In this example computing the forward error would be to compute,
-    <span class="math">\(|A^{-1} b - x_{est}|\)</span> which requires a matrix inversion
-    (and that computation may itself have errors of its own). Many times its
-    easier to compute the backward errors than the forward errors. <span class="dt-note"> this is a note </span></p>
-</li>
-</ol>
-<p><strong>Condition Number</strong>:
-A problem is well conditioned if low for backward errors imply low forward errors.
+so that the approximate solution becomes exact? To understand this consider
+solving the system of linear equations <span class="math">\(Ax = b\)</span>. Assume that we have an
+approximate algorithm which gives us <span class="math">\(x_{est}\)</span>. We can compute <span class="math">\(Ax_{est} = b_{est}\)</span>,
+the change <span class="math">\(b - b_{est}\)</span> is a change in <span class="math">\(b\)</span> (which is part of the problem
+<em>formulation</em> ) can make the approximate solution exact. This is called the
+backward error. In this example computing the forward error would be to compute,
+<span class="math">\(|A^{-1} b - x_{est}|\)</span> which requires a matrix inversion
+(and that computation may itself have errors of its own). Many times its
+easier to compute the backward errors than the forward errors.</p>
+<h3>Condition Number</h3>
+<p>A problem is well conditioned if low for backward errors imply low forward errors.
 So a small change in the problem (e.g. values of matrix <span class="math">\(A\)</span> in <span class="math">\(Ax = b\)</span>) will
 have small change the solution.</p>
 <p>In numerical linear algebra we compute the condition number of a matrix to judge
 its <em>well-behavedness</em>. The condition number of a matrix A with respect to
-a given norm <span class="math">\(\| \cdot \|\)</span> is, |-| this is not working |-|</p>
-<p class=framed>
+a given norm <span class="math">\(\| \cdot \|\)</span> is,</p>
+<p class="equation">
 \begin{equation}
     \text{cond}(A) = \frac{\| A \|}{ \| A^{-1} \|}
 \end{equation}
@@ -157,7 +155,7 @@ a given norm <span class="math">\(\| \cdot \|\)</span> is, |-| this is not worki
 </code></pre></div>
 
 
-<div class="highlight"><pre><span></span><code><span class="err">67601.23007370268</span>
+<div class="highlight"><pre><span></span><code><span class="err">0.007758280786619163</span>
 </code></pre></div>
 
 
@@ -172,7 +170,7 @@ a given norm <span class="math">\(\| \cdot \|\)</span> is, |-| this is not worki
 </code></pre></div>
 
 
-<p><img alt="" src="figures/NumericalAnalysis_4_1.png"></p>
+<p><img alt="" src="figures/NumericalAnalysis_5_1.png"></p>
 <hr>
 <p>References:</p>
 <p>[1] Trefethen, Lloyd N., and David Bau III.

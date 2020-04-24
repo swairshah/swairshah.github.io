@@ -6,20 +6,24 @@ options:
 Title: Spiral Arms Simulation
 Date: 2020-04-18
 Category: Julia, Simulation, Physics
+Summary: Simulating the Galactic Spiral Arms in Julia
+
+
 
 ## Spiral Arms in Galaxies
 A few weeks back I came across a nice simulation on twitter which explained how
-spiral arms are formed in some galaxies [+]![](figures/galaxy2.png)[+].
+spiral arms are formed in some galaxies.
 We can see the spiral arms in this hubble picture of the
 M18 galaxy [+]![M18](figures/galaxy.jpg)[+].
+
 It turns out there is a theory called the Lin-Shu Theory or
 [Density Wave Theory](https://en.wikipedia.org/wiki/Density_wave_theory) which
-explains these spiral arms as the high density regions in a galaxy where many
-elliptical orbits of objects revolving around the center of the galaxy happen to pass.
+explains these spiral arms as the high density regions where many
+elliptical orbits around the center of the galaxy happen to pass. Wikipedia has
+some useful plots and animations [+]![](figures/galaxy2.png)[+].
 A friend of mine is an avid astrophotographer he wanted to know if the generation
 of subsequent elliptical orbits is more stochastic would it still lead to such
-a phenomenon.  I created a simulation in Julia to try this out.
-
+a phenomenon. I created a simulation in Julia to try this out.
 It is somewhat instructive to go through the process of building up such a simulation
 in Julia.
 
@@ -44,14 +48,14 @@ gr(leg=false, bg=colorant"#FFFFF8", aspect_ratio=1,
 using ColorSchemes, Colors
 orange = get(ColorSchemes.rainbow, 0.944);
 ```
-It is very straight forward to plot this in julia
+It is very straight forward to plot this in Julia
 ```julia
 using Plots
 xₜ(t) = cos(t)
 yₜ(t) = sin(t)
 plot(xₜ, yₜ, 0, 2π, size=(300,300))
 ```
-To plot an ellipse we need to add ability to scale major and minor
+To plot an ellipse we need to the add the ability to scale major and minor
 axes differently.
 ```julia
 using Plots
@@ -91,7 +95,24 @@ yₜ(t) = b*cos(t)*sin(ϕ) - b*sin(t)*cos(ϕ)
 plot(xₜ, yₜ, 0, 2π, size=(300,300))
 ```
 
+I tend to forget the order of entries in the rotation operator. I use the
+following trick to derive it
+
+<p class=equation>
+$$
+x → cos~\theta,~ y → sin~\theta\\
+\\
+e^{i\theta} = cos~\theta + i~sin~\theta \\
+e^{i(\theta + \phi)} = e^{i\theta}~e^{i\phi} \\
+∴ e^{i(\theta + \phi)} = cos~\theta~cos\phi - sin~\theta~sin~\phi +i~(cos~\theta~sin~\phi + sin~\theta~sin~\phi) \\
+\\
+x ← x~cos~\phi - y~sin~\phi, ~y ← x~sin~\phi + x~cos~\phi \\
+$$
+</p>
+
 ## Animating Plots
+
+We can use the `Interact` package to create a GIF.
 
 ```julia
 using Interact
@@ -126,7 +147,8 @@ function simulate(ϵ = 0.5)
       plot!(xₜ, yₜ, 0, 2π, color=:orangered)
    end
    anim
-end;
+end
+simulate(0.5);
 ```
 
 ```julia echo=false

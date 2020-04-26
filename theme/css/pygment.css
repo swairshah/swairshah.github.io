@@ -14,7 +14,7 @@ green     #859900  operators, other keywords
 */
 
 pre .lineno { color: #93a1a1 } /* Line Numbers */
-pre,code { background-color: #fdf6e3; color: #586e75 }
+pre,code { background-color: #FFFFF8; color: #586e75 }
 pre .c { color: #93a1a1 } /* Comment */
 pre .err { color: #586e75 } /* Error */
 pre .g { color: #586e75 } /* Generic */

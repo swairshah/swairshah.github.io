@@ -9,6 +9,7 @@
 
 /* Imports */
 @import url("typogrify.css");
+@import url("pygment.css");
 
 header nav li { display: inline;
                 padding-right: .5rem; }

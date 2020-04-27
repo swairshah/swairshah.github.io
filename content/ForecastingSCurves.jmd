@@ -11,20 +11,17 @@ Category: Julia, Covid
 
 In the past few weeks the twitter-verse has seen a deluge of amateur
 epidemiological models and forecasts (though some of them are
-quite nice [1](http://systrom.com/blog/the-metric-we-need-to-manage-covid-19/)
+quite nice [1])
 Due to the ongoing Coronavirus pademic its understandable that
 data science enthusiasts have started to dabble around in epidemiological
 modelling. This craze has been subjected to a fair bit of criticism, as
 like most modelling in the real world, epidemiological modelling is quite
 difficult and requires a good deal of domain knowledge.
-One of the posts I came across is called 'Forecasting S-curves is hard'
-[2](https://constancecrozier.com/2020/04/16/forecasting-s-curves-is-hard/)
-.
+One of the posts I came across is called 'Forecasting S-curves is hard' [2].
 Its a good demo which shows how widely can s-curve forecasts swing as we
 see more data. The tweet by Constance Crozier which shared this post
 started off as 'I spent a humiliating amount of time learning how to make
-animated graphs, just to illustrate a fairly obvious point'
-[3](https://twitter.com/clcrozier/status/1251148890595708938?s=20).
+animated graphs, just to illustrate a fairly obvious point' [3].
 I empathize with that sentiment having tried similar things in Python before.
 In this post I want to share my experience recreating and then enhancing this
 demo using Julia. In process I want to bring to light a few excellent features

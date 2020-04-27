@@ -5,8 +5,8 @@ from __future__ import unicode_literals
 AUTHOR = 'Swair'
 SITENAME = 'Working Notes'
 SITEURL = ''
-#THEME = 'TuftePelican'
-THEME = 'simple'
+THEME = 'TuftePelican'
+#THEME = 'simple'
 PLUGIN_PATHS = ['/Users/swairshah/work/writing/pelican-plugins']
 PLUGINS = ['render_math', 'code_include','md_inline_extension'] #'simple_footnotes']
 MD_INLINE = {

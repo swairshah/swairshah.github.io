@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <!--script async src="https://www.googletagmanager.com/gtag/js?id=UA-41105501-1"></script-->
+  <script type="text/javascript" src="/theme/js/refs_v1.js"> </script> 
+  <script type="text/javascript" src="/theme/js/bibtexParse.js"> </script> 
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-41105501-1');
+  </script>
+
+  <meta charset="utf-8" />
+  <title>Understanding AD</title>
+  <meta name="author" content="Swair" />
+  <link rel="stylesheet" type="text/css" href="/theme/tufte-css/tufte.css" />
+  <link rel="stylesheet" type="text/css" href="/theme/css/main.css" />
+  <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png" />
+  <link rel="shortcut icon" href="/static/favicon.ico" />
+  <link rel="icon" type="image/png" href="/static/favicon.png" />
+
+  <!-- OpenGraph Info -->
+
+
+  <style type="text/css">
+    .blue {
+      color: blue;
+    }
+  </style>
+
+
+</head>
+
+<body>
+<header>
+  <h1 class="websitetitle"><a href="">Working Notes</a></h1>
+  <!-- <nav class="navmenu" id="navmenu">
+    <li><a class="navitemlink" href="/archives.html">Archive</a></li>
+   </nav> -->
+   <nav class="navmenu" id="navmenu">
+    <li><a class="navitemlink" href="/pages/about.html">About</a></li>
+    <li><a class="navitemlink" href="/">Blog</a></li>
+    <li><a class="navitemlink" href="/archives.html">Archive</a></li>
+   </nav>
+ </header>
+<article>
+
+<header class="post-header">
+<h1> <a rel="bookmark"
+   title="Understanding AD «Working Notes»"
+   href="/understanding-ad.html">
+   Understanding AD
+</a>
+</h1>
+<p class="subtitle"></p>
+<p class="articlemeta"><label for="understanding-ad" class="margin-toggle"> ⊕</label><input type="checkbox" id="understanding-ad" class="margin-toggle" />
+<span class="marginnote"><br/>
+By Swair.
+<br/><br />
+Category: <a href="/category/numerical-linear-algebra-ml-julia-python-ad-automatic-differentiation.html">Numerical-Linear-Algebra, ML, Julia, Python, AD, Automatic-Differentiation</a>
+<br />
+<br /><br/>
+<time datetime="2024-07-17T00:00:00-07:00">Wed 17 July 2024</time>
+
+</span>
+</p>
+
+
+
+</header><div id="TOC"> </div>
+<p>There is a ton of material out there for understanding Automatic
+Differentiation. I created these notes when I tried to
+understand different flavors of AD.</p>
+<h2>Dual Numbers</h2>
+<p>If we augment all numeric datatypes in the languages,
+such that each number $x$ is represented as
+$x + ϵ x'$, with the property that
+$ϵ^2 = 0$, we can implement a version of
+AD called forward mode AD.</p>
+<p>This gives us a new arithmetic</p>
+<p>$$
+\begin{align<em>}
+(x + x'ϵ) + (y + y'ϵ) &amp;= (x + y) + (x' + y') ϵ . \
+(x + x'ϵ ) ⋅ (y + y'ϵ) &amp;= (xy) + (xy' + yx') ϵ + x'y' ϵ^2 \
+                      &amp;=  (xy) + (xy' + yx') ϵ \
+P(x) &amp;= p_0 + p_1 x + p_2 x^2 + \ldots + p_n x^n \
+P(x + x'ϵ)&amp;= p_0 + p_1 x +  \ldots + p_n x^n+ \
+           &amp; p_1 x' ϵ + 2p_2 x x' + \ldots + np_n x^{n-1}x'ϵ\
+&amp;= P(x) + P^{(1)}(x)x' ϵ \
+\end{align</em>}
+$$</p>
+<p>The purpose of the added
+term is to track the derivative with respect to $x$.
+In a long series of computation anytime we need to
+look up the differentiation of the computation with
+respect to $x$ we peek at the coefficient of $\epsilon$.
+Lets start with $f(x) = x$, the identity function.
+$f(x) = x = (x + x'~\epsilon)$. So $\frac{df}{dx} = x'$
+where $x'$ is derivative of $x$ with respect to itself, so 1.
+$f(x) = x + a = (x + a + x'~ε)$ so $\frac{df}{dx}$
+remains the same as before, 1. $f(x) = ax = (ax + ax' ε)$
+gives $\frac{df}{dx} = ax' = a$.
+$f(x) = x^2 = (x^2 + 2xx'ε + x'^2ε^2) = (x^2 + 2xx'ε)$ as $ε^2 = 0$
+giving $\frac{df}{dx} = 2x$, and so on.</p>
+<p>We can define rules for different functions on $x + x' ϵ$,
+e.g. $sin(x + x'ε) = sin(x) + cos(x)x'ϵ$. Thus given
+a fucntion $f$ in our Real Number domain, we have $f + f' ϵ$
+in the Dual Number domain. We can do computation using
+simlar arithmetic for functions.</p>
+<p>$$
+\begin{align<em>}
+(f+g)'(a) &amp;= f'(a) + g'(a)\
+(f \cdot g)'(a) &amp;= f'(a) \, g(a) + f(a) \, g'(a) \
+(f \circ g)'(a) &amp;= f'(g(a)) \, g'(a)\
+\end{align</em>}
+$$</p>
+<p>Lets see an implementation of Dual numbers.</p>
+<p>The basic implementation is very simple in Julia.</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="n">Base</span><span class="o">:</span><span class="w"> </span><span class="o">+</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="p">,</span><span class="w"> </span><span class="o">^</span><span class="p">,</span><span class="w"> </span><span class="o">/</span>
+<span class="k">import</span><span class="w"> </span><span class="n">Base</span><span class="o">:</span><span class="w"> </span><span class="n">convert</span><span class="p">,</span><span class="w"> </span><span class="n">promote_rule</span>
+<span class="k">import</span><span class="w"> </span><span class="n">Base</span><span class="o">:</span><span class="w"> </span><span class="n">sin</span><span class="p">,</span><span class="w"> </span><span class="n">cos</span><span class="p">,</span><span class="w"> </span><span class="n">exp</span>
+<span class="k">struct</span> <span class="kt">D</span><span class="w"> </span><span class="o">&lt;:</span><span class="w"> </span><span class="kt">Number</span><span class="w">  </span><span class="c"># D is a function-derivative pair</span>
+<span class="w">    </span><span class="n">val</span><span class="o">::</span><span class="kt">Float64</span>
+<span class="w">    </span><span class="n">der</span><span class="o">::</span><span class="kt">Float64</span>
+<span class="k">end</span>
+
+<span class="n">convert</span><span class="p">(</span><span class="o">::</span><span class="kt">Type</span><span class="p">{</span><span class="kt">D</span><span class="p">},</span><span class="w"> </span><span class="n">x</span><span class="o">::</span><span class="kt">Real</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">zero</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">promote_rule</span><span class="p">(</span><span class="o">::</span><span class="kt">Type</span><span class="p">{</span><span class="kt">D</span><span class="p">},</span><span class="w"> </span><span class="o">::</span><span class="kt">Type</span><span class="p">{</span><span class="o">&lt;:</span><span class="kt">Number</span><span class="p">})</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D</span>
+
+<span class="o">+</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="kt">D</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">::</span><span class="kt">D</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">val</span><span class="w"> </span><span class="o">.+</span><span class="w"> </span><span class="n">y</span><span class="o">.</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="o">.</span><span class="n">der</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="o">.</span><span class="n">der</span><span class="p">)</span>
+<span class="o">-</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="kt">D</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">::</span><span class="kt">D</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">val</span><span class="w"> </span><span class="o">.+</span><span class="w"> </span><span class="n">y</span><span class="o">.</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="o">.</span><span class="n">der</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="o">.</span><span class="n">der</span><span class="p">)</span>
+<span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="kt">D</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">::</span><span class="kt">D</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">val</span><span class="o">*</span><span class="n">y</span><span class="o">.</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">der</span><span class="o">*</span><span class="n">y</span><span class="o">.</span><span class="n">val</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="o">.</span><span class="n">val</span><span class="o">*</span><span class="n">y</span><span class="o">.</span><span class="n">der</span><span class="p">))</span>
+<span class="o">/</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="kt">D</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">::</span><span class="kt">D</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">val</span><span class="o">/</span><span class="n">y</span><span class="o">.</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">val</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">der</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">x</span><span class="o">.</span><span class="n">val</span><span class="o">*</span><span class="n">y</span><span class="o">.</span><span class="n">der</span><span class="p">)</span><span class="o">/</span><span class="n">y</span><span class="o">.</span><span class="n">val</span><span class="o">^</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="kt">D</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">val</span><span class="p">),</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">val</span><span class="p">)</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">der</span><span class="p">)</span>
+<span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="kt">D</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D</span><span class="p">(</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">val</span><span class="p">),</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">val</span><span class="p">)</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">der</span><span class="p">)</span>
+<span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="kt">D</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">D</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">val</span><span class="p">),</span><span class="w"> </span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">val</span><span class="p">)</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">der</span><span class="p">)</span>
+
+<span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="n">x</span><span class="o">^</span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">f</span><span class="p">(</span><span class="n">D</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span>
+
+<span class="n">sin</span><span class="p">(</span><span class="n">D</span><span class="p">(</span><span class="nb">π</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">))</span><span class="o">.</span><span class="n">der</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="nb">π</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>true
+</code></pre></div>
+
+<p>In order to have seamless integration with other Numeric types we need to
+take care of some more things.</p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="n">Base</span><span class="o">:</span><span class="w"> </span><span class="o">+</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="p">,</span><span class="w"> </span><span class="o">^</span><span class="p">,</span><span class="w"> </span><span class="o">/</span><span class="p">,</span><span class="w"> </span><span class="n">convert</span><span class="p">,</span><span class="w"> </span><span class="n">promote_rule</span><span class="p">,</span><span class="w"> </span><span class="n">widen</span>
+<span class="k">struct</span> <span class="kt">Dual</span><span class="p">{</span><span class="kt">T</span><span class="o">&lt;:</span><span class="kt">Real</span><span class="p">}</span><span class="w"> </span><span class="o">&lt;:</span><span class="w"> </span><span class="kt">Number</span>
+<span class="w">    </span><span class="n">val</span><span class="o">::</span><span class="kt">T</span><span class="w">   </span><span class="c"># value</span>
+<span class="w">    </span><span class="n">der</span><span class="o">::</span><span class="kt">T</span><span class="w">  </span><span class="c"># derivative</span>
+<span class="k">end</span>
+<span class="n">Dual</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="kt">S</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">::</span><span class="kt">T</span><span class="p">)</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="p">{</span><span class="kt">S</span><span class="o">&lt;:</span><span class="kt">Real</span><span class="p">,</span><span class="kt">T</span><span class="o">&lt;:</span><span class="kt">Real</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dual</span><span class="p">(</span><span class="n">promote</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span><span class="o">...</span><span class="p">)</span>
+<span class="n">Dual</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="kt">Real</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dual</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">zero</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="kt">Dual</span><span class="p">{</span><span class="kt">T</span><span class="p">}(</span><span class="n">x</span><span class="o">::</span><span class="kt">Real</span><span class="p">)</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="kt">T</span><span class="o">&lt;:</span><span class="kt">Real</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Dual</span><span class="p">{</span><span class="kt">T</span><span class="p">}(</span><span class="n">T</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">zero</span><span class="p">(</span><span class="n">T</span><span class="p">))</span>
+
+
+<span class="n">promote_rule</span><span class="p">(</span><span class="o">::</span><span class="kt">Type</span><span class="p">{</span><span class="kt">Dual</span><span class="p">},</span><span class="w"> </span><span class="o">::</span><span class="kt">Type</span><span class="p">{</span><span class="o">&lt;:</span><span class="kt">Number</span><span class="p">})</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dual</span>
+<span class="n">promote_rule</span><span class="p">(</span><span class="o">::</span><span class="kt">Type</span><span class="p">{</span><span class="kt">Dual</span><span class="p">{</span><span class="kt">T</span><span class="p">}},</span><span class="w"> </span><span class="o">::</span><span class="kt">Type</span><span class="p">{</span><span class="kt">Dual</span><span class="p">{</span><span class="kt">S</span><span class="p">}})</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="p">{</span><span class="kt">T</span><span class="o">&lt;:</span><span class="kt">Real</span><span class="p">,</span><span class="kt">S</span><span class="o">&lt;:</span><span class="kt">Real</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Dual</span><span class="p">{</span><span class="kt">promote_type</span><span class="p">(</span><span class="kt">T</span><span class="p">,</span><span class="w"> </span><span class="kt">S</span><span class="p">)}</span>
+<span class="n">promote_rule</span><span class="p">(</span><span class="o">::</span><span class="kt">Type</span><span class="p">{</span><span class="kt">Dual</span><span class="p">{</span><span class="kt">T</span><span class="p">}},</span><span class="w"> </span><span class="o">::</span><span class="kt">Type</span><span class="p">{</span><span class="kt">S</span><span class="p">})</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="p">{</span><span class="kt">T</span><span class="o">&lt;:</span><span class="kt">Real</span><span class="p">,</span><span class="kt">S</span><span class="o">&lt;:</span><span class="kt">Real</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Dual</span><span class="p">{</span><span class="kt">promote_type</span><span class="p">(</span><span class="kt">T</span><span class="p">,</span><span class="w"> </span><span class="kt">S</span><span class="p">)}</span>
+<span class="n">promote_rule</span><span class="p">(</span><span class="o">::</span><span class="kt">Type</span><span class="p">{</span><span class="kt">Dual</span><span class="p">{</span><span class="kt">T</span><span class="p">}},</span><span class="w"> </span><span class="o">::</span><span class="kt">Type</span><span class="p">{</span><span class="kt">T</span><span class="p">})</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="p">{</span><span class="kt">T</span><span class="o">&lt;:</span><span class="kt">Real</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Dual</span><span class="p">{</span><span class="kt">T</span><span class="p">}</span>
+<span class="n">widen</span><span class="p">(</span><span class="o">::</span><span class="kt">Type</span><span class="p">{</span><span class="kt">Dual</span><span class="p">{</span><span class="kt">T</span><span class="p">}})</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="p">{</span><span class="kt">T</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Dual</span><span class="p">{</span><span class="kt">widen</span><span class="p">(</span><span class="kt">T</span><span class="p">)}</span>
+
+
+
+<span class="n">convert</span><span class="p">(</span><span class="o">::</span><span class="kt">Type</span><span class="p">{</span><span class="kt">Dual</span><span class="p">{</span><span class="kt">T</span><span class="p">}},</span><span class="w"> </span><span class="n">z</span><span class="o">::</span><span class="kt">Dual</span><span class="p">{</span><span class="kt">T</span><span class="p">})</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="p">{</span><span class="kt">T</span><span class="o">&lt;:</span><span class="kt">Real</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">z</span>
+<span class="n">convert</span><span class="p">(</span><span class="o">::</span><span class="kt">Type</span><span class="p">{</span><span class="kt">Dual</span><span class="p">{</span><span class="kt">T</span><span class="p">}},</span><span class="w"> </span><span class="n">z</span><span class="o">::</span><span class="kt">Dual</span><span class="p">)</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="p">{</span><span class="kt">T</span><span class="o">&lt;:</span><span class="kt">Real</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Dual</span><span class="p">{</span><span class="kt">T</span><span class="p">}(</span><span class="n">convert</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="o">.</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">convert</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="o">.</span><span class="n">der</span><span class="p">)))</span>
+
+<span class="o">+</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="kt">Dual</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">::</span><span class="kt">Dual</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dual</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">val</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="o">.</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="o">.</span><span class="n">der</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="o">.</span><span class="n">der</span><span class="p">)</span>
+<span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="kt">Dual</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">::</span><span class="kt">Dual</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dual</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">val</span><span class="o">*</span><span class="n">y</span><span class="o">.</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="o">.</span><span class="n">val</span><span class="o">*</span><span class="n">y</span><span class="o">.</span><span class="n">der</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="o">.</span><span class="n">val</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">der</span><span class="p">)</span>
+<span class="o">-</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="kt">Dual</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">::</span><span class="kt">Dual</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dual</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">val</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">y</span><span class="o">.</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="o">.</span><span class="n">der</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">y</span><span class="o">.</span><span class="n">der</span><span class="p">)</span>
+<span class="o">/</span><span class="p">(</span><span class="n">x</span><span class="o">::</span><span class="kt">Dual</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">::</span><span class="kt">Dual</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dual</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">val</span><span class="o">/</span><span class="n">y</span><span class="o">.</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">val</span><span class="o">*</span><span class="n">x</span><span class="o">.</span><span class="n">der</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">x</span><span class="o">.</span><span class="n">val</span><span class="o">*</span><span class="n">y</span><span class="o">.</span><span class="n">der</span><span class="p">)</span><span class="o">/</span><span class="n">y</span><span class="o">.</span><span class="n">der</span><span class="o">^</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c"># allow adding duals to reals</span>
+<span class="n">convert</span><span class="p">(</span><span class="o">::</span><span class="kt">Type</span><span class="p">{</span><span class="kt">Dual</span><span class="p">},</span><span class="w"> </span><span class="n">x</span><span class="o">::</span><span class="kt">Number</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dual</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">convert</span><span class="p">(</span><span class="o">::</span><span class="kt">Type</span><span class="p">{</span><span class="kt">Dual</span><span class="p">},</span><span class="w"> </span><span class="n">x</span><span class="o">::</span><span class="kt">Dual</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span>
+<span class="c"># automatically promote Number types to Dual Number types</span>
+
+<span class="n">sin</span><span class="p">(</span><span class="mi">4</span><span class="o">::</span><span class="kt">Dual</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">Error</span><span class="o">:</span><span class="w"> </span><span class="n">TypeError</span><span class="o">:</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">typeassert</span><span class="o">,</span><span class="w"> </span><span class="n">expected</span><span class="w"> </span><span class="n">Main</span><span class="o">.</span><span class="na">var</span><span class="s2">&quot;##WeaveSandBox#242&quot;</span><span class="o">.</span><span class="na">Dual</span>
+<span class="o">,</span><span class="w"> </span><span class="n">got</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">type</span><span class="w"> </span><span class="n">Int64</span>
+</code></pre></div>
+
+<p>$$</p>
+<p>z = Wx + b \</p>
+<p>y = \sigma(z) \</p>
+<p>\mathcal{L} = \frac{1}{2}| y - t | ^2 \</p>
+<p>$$</p>
+<p>Test
+$$
+\bar{\mathcal{L}} = \frac{df}{d\mathcal{L}} = 1 \</p>
+<p>\bar{y} = \frac{df}{d \mathcal{L}} \frac{d \mathcal{L}} {d y}  = \bar{\mathcal{L}} (y - t) \</p>
+<p>\bar{z} = \bar{y} \frac{dy}{dz} = \bar{y} \sigma'(z) \</p>
+<p>\bar{W} = \bar{z} x \</p>
+<p>\bar{b} = \bar{z}</p>
+<p>$$</p>
+<div class="highlight"><pre><span></span><code><span class="k">using</span><span class="w"> </span><span class="n">ChainRules</span>
+
+<span class="c"># y = w1*x + w2</span>
+<span class="k">function</span><span class="w"> </span><span class="n">Layer</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span><span class="w"> </span><span class="n">w2</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">)</span>
+<span class="w">  </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">w1</span><span class="o">*</span><span class="n">x</span>
+<span class="w">  </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">w2</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">b</span>
+<span class="k">end</span>
+
+<span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">w1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"> </span><span class="n">w2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+
+<span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">Ba</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rrule</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="n">w1</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">)</span>
+<span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">Bb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rrule</span><span class="p">(</span><span class="o">+</span><span class="p">,</span><span class="w"> </span><span class="n">w2</span><span class="p">)</span>
+
+<span class="n">b̄</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="n">_</span><span class="p">,</span><span class="w"> </span><span class="n">ā</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Bb</span><span class="p">(</span><span class="n">extern</span><span class="p">(</span><span class="n">b̄</span><span class="p">))</span>
+<span class="n">_</span><span class="p">,</span><span class="w"> </span><span class="n">_</span><span class="p">,</span><span class="w"> </span><span class="n">x̄</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Ba</span><span class="p">(</span><span class="n">extern</span><span class="p">(</span><span class="n">ā</span><span class="p">))</span>
+<span class="n">extern</span><span class="p">(</span><span class="n">x̄</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="k">Error</span><span class="o">:</span><span class="w"> </span><span class="n">UndefVarError</span><span class="o">:</span><span class="w"> </span><span class="n n-Quoted">`rrule`</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="n">defined</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="k">using</span><span class="w"> </span><span class="n">Zygote</span><span class="p">,</span><span class="w"> </span><span class="n">Flux</span>
+<span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.1</span>
+<span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+
+<span class="n">w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="n">Layer</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">w</span><span class="o">*</span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span>
+<span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="n">Bz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pullback</span><span class="p">(</span><span class="n">Layer</span><span class="p">,</span><span class="w"> </span><span class="n">w</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">)</span>
+<span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">By</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pullback</span><span class="p">(</span><span class="n">sigmoid</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="p">)</span>
+<span class="n">l</span><span class="p">,</span><span class="w"> </span><span class="n">Bl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pullback</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="n">t</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span>
+<span class="n">l̄</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="n">ȳ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Bl</span><span class="p">(</span><span class="n">l̄</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">z̄</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">By</span><span class="p">(</span><span class="n">ȳ</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">w̄</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Bz</span><span class="p">(</span><span class="n">z̄</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">b̄</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Bz</span><span class="p">(</span><span class="n">z̄</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">println</span><span class="p">(</span><span class="n">w̄</span><span class="p">,</span><span class="w"> </span><span class="n">b̄</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>-0.018651865697707083-0.009325932848853542
+</code></pre></div>
+
+<p>For any $x$ in the computation we write $\partial y/ \partial x$ as $\bar{x}$</p>
+</article>
+<!--div id="disqus_thread"></div-->
+<script>
+doTOC();
+doNotes();
+</script>
+
+
+<!-- <footer>
+  <p>Powered by <a href="http://pelican.readthedocs.org">Pelican</a></p>
+</footer> -->
+<!--script id="dsq-count-scr" src="//isaythings.disqus.com/count.js" async></script-->
+</body>
+
+</html>

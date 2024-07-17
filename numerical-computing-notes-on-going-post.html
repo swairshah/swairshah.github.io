@@ -46,6 +46,7 @@
     <li><a class="navitemlink" href="/archives.html">Archive</a></li>
    </nav>
  </header>
+
 <article>
 
 <header class="post-header">
@@ -77,33 +78,37 @@ of the algorithms I came across were wonderful, e.g. Lanczos Iterations,
 Power Method. As I never had a proper course in Numerical Analysis
 I feel the need to understand some things which I missed. I will keep addind the
 notes and references here. I will also include some Julia or Python code.</p>
+<p>[-] sample1 [-].</p>
+<p>This is a test.
+[+]  asfadf $$ \frac{1}{e^{-x}} $$ [+].</p>
 <h2>Errors in numerical computations and condition number</h2>
 <p>There are various ways erros can creep into numerical computations,
 e.g. discretization, modelling, approximation etc.
 In many numerical computations we are trying to approximate a solution.
 If we don't know the exact solution then how can we estimate the errors?
-For example say, we want to find a root <span class="math">\(x_*\)</span> of <span class="math">\(f(x) = 0\)</span>,
-and our approxiate solution is <span class="math">\(x_{est}\)</span>, how do we measure error
-<span class="math">\(|x_* - x_{est}|\)</span> without knowing  <span class="math">\(x_*\)</span>?</p>
+For example say, we want to find a root $x_<em>$ of $f(x) = 0$,
+and our approxiate solution is $x_{est}$, how do we measure error
+$|x_</em> - x_{est}|$ without knowing  $x_*$?</p>
 <p><strong>Forward Error</strong>: Use a proxy for the actual error as an estimate for the real
-error. E.g. use <span class="math">\(|f(x_*) - f(x_{est})|\)</span> as a proxy for <span class="math">\(|x_* - x_{est}|\)</span>.</p>
+error. E.g. use $|f(x_<em>) - f(x_{est})|$ as a proxy for $|x_</em> - x_{est}|$.</p>
 <p><strong>Backward Error</strong>: Estimate how much change in the problem is necessary
 so that the approximate solution becomes exact? To understand this consider
-solving the system of linear equations <span class="math">\(Ax = b\)</span>. Assume that we have an
-approximate algorithm which gives us <span class="math">\(x_{est}\)</span>. We can compute <span class="math">\(Ax_{est} = b_{est}\)</span>,
-the change <span class="math">\(b - b_{est}\)</span> is a change in <span class="math">\(b\)</span> (which is part of the problem
+solving the system of linear equations $Ax = b$. Assume that we have an
+approximate algorithm which gives us $x_{est}$. We can compute $Ax_{est} = b_{est}$,
+the change $b - b_{est}$ is a change in $b$ (which is part of the problem
 <em>formulation</em> ) can make the approximate solution exact. This is called the
 backward error. In this example computing the forward error would be to compute,
-<span class="math">\(|A^{-1} b - x_{est}|\)</span> which requires a matrix inversion
+$|A^{-1} b - x_{est}|$ which requires a matrix inversion
 (and that computation may itself have errors of its own). Many times its
 easier to compute the backward errors than the forward errors.</p>
+<p>[-] sample1 [-].</p>
 <h3>Condition Number</h3>
 <p>A problem is well conditioned if low for backward errors imply low forward errors.
-So a small change in the problem (e.g. values of matrix <span class="math">\(A\)</span> in <span class="math">\(Ax = b\)</span>) will
+So a small change in the problem (e.g. values of matrix $A$ in $Ax = b$) will
 have small change the solution.</p>
 <p>In numerical linear algebra we compute the condition number of a matrix to judge
 its <em>well-behavedness</em>. The condition number of a matrix A with respect to
-a given norm <span class="math">\(\| \cdot \|\)</span> is,</p>
+a given norm $| \cdot |$ is,</p>
 <p class="equation">
 \begin{equation}
     \text{cond}(A) = \frac{\| A \|}{ \| A^{-1} \|}
@@ -111,64 +116,60 @@ a given norm <span class="math">\(\| \cdot \|\)</span> is,</p>
 </p>
 
 <h2>Gradient Descent</h2>
-<div class="highlight"><pre><span></span><code><span class="k">using</span> <span class="n">Flux</span>
+<div class="highlight"><pre><span></span><code><span class="k">using</span><span class="w"> </span><span class="n">Flux</span>
 
-<span class="k">abstract</span> <span class="k">type</span> <span class="n">DescentMethod</span> <span class="k">end</span>
-<span class="k">struct</span> <span class="n">GradientDescent</span> <span class="o">&lt;:</span> <span class="n">DescentMethod</span>
-    <span class="n">α</span>
+<span class="k">abstract</span><span class="w"> </span><span class="k">type</span> <span class="kt">DescentMethod</span><span class="w"> </span><span class="k">end</span>
+<span class="k">struct</span> <span class="kt">GradientDescent</span><span class="w"> </span><span class="o">&lt;:</span><span class="w"> </span><span class="kt">DescentMethod</span>
+<span class="w">    </span><span class="n">α</span>
 <span class="k">end</span>
 
-<span class="n">init!</span><span class="p">(</span><span class="n">M</span><span class="o">::</span><span class="n">GradientDescent</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">∇f</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">=</span> <span class="n">M</span>
-<span class="k">function</span> <span class="n">step!</span><span class="p">(</span><span class="n">M</span><span class="o">::</span><span class="n">GradientDescent</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">∇f</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-    <span class="n">α</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">α</span><span class="p">,</span> <span class="n">∇f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">x</span> <span class="o">-</span> <span class="n">α</span><span class="o">*</span><span class="n">g</span>
+<span class="n">init!</span><span class="p">(</span><span class="n">M</span><span class="o">::</span><span class="kt">GradientDescent</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">∇f</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">M</span>
+<span class="k">function</span><span class="w"> </span><span class="n">step!</span><span class="p">(</span><span class="n">M</span><span class="o">::</span><span class="kt">GradientDescent</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">∇f</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">)</span>
+<span class="w">    </span><span class="n">α</span><span class="p">,</span><span class="w"> </span><span class="n">g</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">M</span><span class="o">.</span><span class="n">α</span><span class="p">,</span><span class="w"> </span><span class="n">∇f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">α</span><span class="o">*</span><span class="n">g</span>
 <span class="k">end</span>
 
-<span class="k">function</span> <span class="n">minimize</span><span class="p">(</span><span class="n">M</span><span class="o">::</span><span class="n">DescentMethod</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">∇f</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">ε</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span>
-    <span class="n">init!</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">∇f</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="kp">in</span> <span class="mi">1</span> <span class="o">:</span> <span class="n">n</span>
-        <span class="n">x′</span> <span class="o">=</span> <span class="n">step!</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">∇f</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">norm</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x′</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">ε</span>
-            <span class="k">break</span>
-        <span class="k">end</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x′</span>
-    <span class="k">end</span>
-    <span class="k">return</span> <span class="n">x</span>
+<span class="k">function</span><span class="w"> </span><span class="n">minimize</span><span class="p">(</span><span class="n">M</span><span class="o">::</span><span class="kt">DescentMethod</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">∇f</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">ε</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span>
+<span class="w">    </span><span class="n">init!</span><span class="p">(</span><span class="n">M</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">∇f</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">)</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">n</span>
+<span class="w">        </span><span class="n">x′</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">step!</span><span class="p">(</span><span class="n">M</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">∇f</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">x′</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">ε</span>
+<span class="w">            </span><span class="k">break</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x′</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x</span>
 <span class="k">end</span><span class="p">;</span>
 </code></pre></div>
 
-
 <p>Lets compare the solution of <code>A\b</code> to the one achieved by
 <code>GradientDescent</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="n">M</span> <span class="o">=</span> <span class="n">randn</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><span class="n">M</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">randn</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span>
 
-<span class="n">A</span> <span class="o">=</span> <span class="n">M</span><span class="o">&#39;</span> <span class="o">*</span> <span class="n">M</span>
-<span class="n">b</span> <span class="o">=</span> <span class="n">randn</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">M</span><span class="o">&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">M</span>
+<span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">randn</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 
-<span class="n">f</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-&gt;</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="n">x</span><span class="o">&#39;</span> <span class="o">*</span> <span class="n">A</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="n">b</span><span class="o">&#39;</span> <span class="o">*</span> <span class="n">x</span>
-<span class="n">∇f</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-&gt;</span> <span class="n">gradient</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="o">&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">b</span><span class="o">&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span>
+<span class="n">∇f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">gradient</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
 
-<span class="n">x</span> <span class="o">=</span> <span class="n">randn</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-<span class="n">x̂</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">GradientDescent</span><span class="p">(</span><span class="mf">0.05</span><span class="p">),</span> <span class="n">f</span><span class="p">,</span> <span class="n">∇f</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)</span>
+<span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">randn</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">x̂</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">minimize</span><span class="p">(</span><span class="n">GradientDescent</span><span class="p">(</span><span class="mf">0.05</span><span class="p">),</span><span class="w"> </span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">∇f</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mi">5000</span><span class="p">)</span>
 
-<span class="n">print</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">x̂</span> <span class="o">-</span> <span class="n">A</span><span class="o">\</span><span class="n">b</span><span class="p">))</span>
+<span class="n">print</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">x̂</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">A</span><span class="o">\</span><span class="n">b</span><span class="p">))</span>
 </code></pre></div>
 
-
-<div class="highlight"><pre><span></span><code><span class="err">5.654162898555161</span>
+<div class="highlight"><pre><span></span><code><span class="mf">0.01340846520341367</span>
 </code></pre></div>
-
 
 <h2>Conjugate Gradients</h2>
-<div class="highlight"><pre><span></span><code><span class="k">using</span> <span class="n">LinearAlgebra</span><span class="p">,</span> <span class="n">IterativeSolvers</span>
+<div class="highlight"><pre><span></span><code><span class="k">using</span><span class="w"> </span><span class="n">LinearAlgebra</span><span class="p">,</span><span class="w"> </span><span class="n">IterativeSolvers</span>
 
-<span class="n">A</span> <span class="o">=</span> <span class="n">diagm</span><span class="p">(</span><span class="mi">100</span><span class="o">:</span><span class="mi">199</span><span class="p">)</span>
-<span class="n">b</span> <span class="o">=</span> <span class="n">ones</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
-<span class="n">x</span><span class="p">,</span> <span class="n">history</span> <span class="o">=</span> <span class="n">cg</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">true</span><span class="p">)</span>
+<span class="n">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">diagm</span><span class="p">(</span><span class="mi">100</span><span class="o">:</span><span class="mi">199</span><span class="p">)</span>
+<span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ones</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cg</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">log</span><span class="o">=</span><span class="nb">true</span><span class="p">)</span>
 
-<span class="n">plot</span><span class="p">(</span><span class="n">history</span><span class="p">[</span><span class="o">:</span><span class="n">resnorm</span><span class="p">],</span> <span class="n">legend</span><span class="o">=</span><span class="kc">false</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">history</span><span class="p">[</span><span class="ss">:resnorm</span><span class="p">],</span><span class="w"> </span><span class="n">legend</span><span class="o">=</span><span class="nb">false</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p><img alt="" src="figures/NumericalAnalysis_5_1.png"></p>
 <hr>
@@ -179,75 +180,96 @@ a given norm <span class="math">\(\| \cdot \|\)</span> is,</p>
     Algorithms for optimization. Mit Press, 2019.</p>
 <p>[3]  Solomon, Justin. Numerical algorithms: methods for computer vision,
     machine learning, and graphics. CRC press, 2015.</p>
-<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "center",
-        indent = "0em",
-        linebreak = "false";
-
-    if (false) {
-        align = (screen.width < 768) ? "left" : align;
-        indent = (screen.width < 768) ? "0em" : indent;
-        linebreak = (screen.width < 768) ? 'true' : linebreak;
-    }
-
-    var mathjaxscript = document.createElement('script');
-    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-    mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
-
-    var configscript = document.createElement('script');
-    configscript.type = 'text/x-mathjax-config';
-    configscript[(window.opera ? "innerHTML" : "text")] =
-        "MathJax.Hub.Config({" +
-        "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
-        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
-        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
-        "    displayAlign: '"+ align +"'," +
-        "    displayIndent: '"+ indent +"'," +
-        "    showMathMenu: true," +
-        "    messageStyle: 'normal'," +
-        "    tex2jax: { " +
-        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
-        "        displayMath: [ ['$$','$$'] ]," +
-        "        processEscapes: true," +
-        "        preview: 'TeX'," +
-        "    }, " +
-        "    'HTML-CSS': { " +
-        "        availableFonts: ['STIX', 'TeX']," +
-        "        preferredFont: 'STIX'," +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
-        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
-        "    }, " +
-        "}); " +
-        "if ('default' !== 'default') {" +
-            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-        "}";
-
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
-}
-</script>
 </article>
 <!--div id="disqus_thread"></div-->
 <script>
 doTOC();
-doNotes();    
+doNotes();
 </script>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <!--script async src="https://www.googletagmanager.com/gtag/js?id=UA-41105501-1"></script-->
+  <script type="text/javascript" src="/theme/js/refs_v1.js"> </script> 
+  <script type="text/javascript" src="/theme/js/bibtexParse.js"> </script> 
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-41105501-1');
+  </script>
+
+  <meta charset="utf-8" />
+  <title>Publications</title>
+  <meta name="author" content="Swair" />
+  <link rel="stylesheet" type="text/css" href="/theme/tufte-css/tufte.css" />
+  <link rel="stylesheet" type="text/css" href="/theme/css/main.css" />
+  <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png" />
+  <link rel="shortcut icon" href="/static/favicon.ico" />
+  <link rel="icon" type="image/png" href="/static/favicon.png" />
+
+  <!-- OpenGraph Info -->
+  <meta property="og:title" content="Working Notes"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:description" content=""/>
+  <meta property="og:url" content=""/>
+
+
+  <style type="text/css">
+    .blue {
+      color: blue;
+    }
+  </style>
+
+
+</head>
+
+<body>
+<header>
+  <h1 class="websitetitle"><a href="">Working Notes</a></h1>
+  <!-- <nav class="navmenu" id="navmenu">
+    <li><a class="navitemlink" href="/archives.html">Archive</a></li>
+   </nav> -->
+   <nav class="navmenu" id="navmenu">
+    <li><a class="navitemlink" href="/pages/about.html">About</a></li>
+    <li><a class="navitemlink" href="/">Blog</a></li>
+    <li><a class="navitemlink" href="/archives.html">Archive</a></li>
+   </nav>
+ </header>
+
+
+<script type="text/javascript">
+    function disp(s) {
+        var win;
+        var doc;
+        win = window.open("", "WINDOWID");
+        doc = win.document;
+        doc.open("text/plain");
+        doc.write("<pre>" + s + "</pre>");
+        doc.close();
+    }
+</script>
+<section id="content" class="body">
+    <h1 class="entry-title">Publications</h1>
+    <ul>
+    </ul>
+</section>
+
+<!--section id="references"> 
+    <script type="text/javascript">
+        const bibtex=``
+    </script>
+</section--!>
+<!-- <footer>
+  <p>Powered by <a href="http://pelican.readthedocs.org">Pelican</a></p>
+</footer> -->
+<!--script id="dsq-count-scr" src="//isaythings.disqus.com/count.js" async></script-->
+</body>
+
+</html>
 <div id="disqus_thread"></div>
     <script>
 
@@ -271,6 +293,12 @@ doNotes();
 
 
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+<!--section id="references"> 
+    <script type="text/javascript">
+        const bibtex=``
+    </script>
+</section--!>
 <!-- <footer>
   <p>Powered by <a href="http://pelican.readthedocs.org">Pelican</a></p>
 </footer> -->

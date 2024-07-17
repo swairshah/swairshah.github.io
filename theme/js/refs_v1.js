@@ -1,4 +1,3 @@
-
 function doReferences() {
     var btex = bibtexParse.toJSON(bibtex);
     var cited = [];
